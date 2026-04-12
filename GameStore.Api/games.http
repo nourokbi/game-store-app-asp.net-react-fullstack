@@ -1,0 +1,37 @@
+GET http://localhost:5277/games
+
+###
+
+GET http://localhost:5277/games/3
+
+###
+
+POST http://localhost:5277/games
+Content-Type: application/json
+
+{
+  "name": "Farcry 5",
+  "genreId": 1,
+  "price": 19.99,
+  "releaseDate": "2018-03-27"
+}
+
+###
+
+PUT http://localhost:5277/games/2
+Content-Type: application/json
+
+{
+  "name": "Super Mario Odyssey II",
+  "genreId": "4",
+  "price": 19.99,
+  "releaseDate": "2020-10-07"
+}
+
+### 
+
+DELETE http://localhost:5277/games/3
+
+###
+
+GET http://localhost:5277/genres
