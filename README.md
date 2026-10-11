@@ -1,84 +1,73 @@
 # ArcadeShelf
 
-A small full-stack **practice project** (my first ASP.NET application) where you can manage a list of games.
-
-- **Backend**: ASP.NET Core Minimal API + EF Core (SQLite)
-- **Frontend**: React + TypeScript (Vite)
+A small full-stack app for managing a game collection. It was my first ASP.NET Core project, built to learn Minimal APIs and EF Core with a React and TypeScript frontend.
 
 ## Features
 
-- Create, edit, and delete games
-- View games as a **table** or **cards**
-- Select multiple games to delete (unchecked games are kept)
-- Light/Dark theme
-- Saves **theme** and **view preference** in `localStorage`
+- Add, edit and delete games, each with a name, genre, price and release date
+- Table view or card view
+- Select several games and delete them in one go
+- Light and dark theme
+- Remembers your theme and view in `localStorage`
 
-## Tech Stack
+## Tech stack
 
-- .NET 10 + ASP.NET Core Minimal APIs
-- Entity Framework Core 10 (SQLite)
-- React + TypeScript (Vite)
-- lucide-react (icons)
+| Part | Tools |
+|---|---|
+| Backend | .NET 10, ASP.NET Core Minimal APIs, Entity Framework Core, SQLite |
+| Frontend | React, TypeScript, Vite, lucide-react |
+| Tooling | EF Core migrations, `.http` request file, Dockerfile for the frontend |
 
-## Prerequisites
+## Backend notes
 
-- .NET SDK 10
-- Node.js 20+ (npm)
+- Endpoints are grouped with `MapGroup` and kept in their own files under `Endpoints/`
+- Request DTOs use data annotations: name is required and at most 50 characters, and price must be between 1 and 100. They're checked with the built-in .NET 10 validation (`AddValidation`)
+- Responses use DTOs, so the EF entities never go straight to the client
+- Migrations apply automatically on startup, and the genre table is seeded the first time if it's empty
+- CORS allows the Vite dev server in development
 
-## Quick Start
+## API
 
-### 1) Run the backend API
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/games` | List games |
+| GET | `/games/{id}` | Get one game |
+| POST | `/games` | Create a game |
+| PUT | `/games/{id}` | Update a game |
+| DELETE | `/games/{id}` | Delete a game |
+| GET | `/genres` | List genres |
+
+You can try them with [GameStore.Api/games.http](GameStore.Api/games.http).
+
+## Run locally
+
+Requirements: .NET 10 SDK and Node.js 20+
 
 ```bash
+# API, runs on http://localhost:5277
 cd GameStore.Api
 dotnet run
 ```
 
-The API runs on:
-
-- `http://localhost:5277`
-
-### 2) Run the frontend
-
 ```bash
+# Frontend, runs on http://localhost:5173
 cd GameStore.Web
 npm install
 npm run dev
 ```
 
-Open:
+To point the frontend at a different API, set `VITE_API_BASE_URL` in `GameStore.Web/.env`.
 
-- `http://localhost:5173`
+## Project structure
 
-## Configuration
-
-Frontend uses `VITE_API_BASE_URL`.
-
-- Default backend URL (dev): `http://localhost:5277`
-- You can override it in `GameStore.Web/.env`:
-
-```env
-VITE_API_BASE_URL=http://localhost:5277
 ```
-
-## API Endpoints (Summary)
-
-- `GET /games`
-- `GET /games/{id}`
-- `POST /games`
-- `PUT /games/{id}`
-- `DELETE /games/{id}`
-- `GET /genres`
-
-You can test them using [GameStore.Api/games.http](GameStore.Api/games.http).
-
-## Project Docs
-
-- Backend docs: [GameStore.Api/README.md](GameStore.Api/README.md)
-- Frontend docs: [GameStore.Web/README.md](GameStore.Web/README.md)
-
-## Notes
-
-- The backend uses SQLite (`GameStore.Api/GameStore.db`) and applies EF migrations automatically on startup.
-- CORS is enabled in Development for `http://localhost:5173` so the Vite dev server can call the API.
-- The repo includes a root `.gitignore` to avoid committing build output, `node_modules`, and the local SQLite DB.
+GameStore.Api/
+  Endpoints/   Games and genres endpoints
+  Dtos/        Request and response records
+  Models/      Game, Genre
+  Data/        DbContext, migrations, seeding
+GameStore.Web/
+  src/App.tsx                 UI: table and card views, forms
+  src/api.ts                  API calls
+  src/useLocalStorageState.ts Hook for saved preferences
+```
